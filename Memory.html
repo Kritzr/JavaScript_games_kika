@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MEMORY GAME</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        body{
+            background: url("./card-bg.jpg");
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+        }
+
+        #board {
+            height: 663px;
+            width: 413px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            background-color: rgb(66, 132, 87);
+            border: 10px solid lightgrey;
+        }
+
+        .card{
+            height: 128px;
+            width: 98px;
+            margin: 2.5px;
+        }
+    </style>
+    <script>
+        var errors = 0;
+        var cardList = [
+            "darkness",
+            "double",
+            "fairy",
+            "fighting",
+            "fire",
+            "grass",
+            "lightning",
+            "metal",
+            "psychic",
+            "water"
+        ]
+
+        var cardSet;
+        var board = [];
+        var rows = 4;
+        var columns = 5;
+        var card1Selected;
+        var card2Selected;
+
+        window.onload = function() {//as windows load, these functions are called without any command
+            shuffleCards();
+            startGame();
+        }
+
+        function shuffleCards() {
+            cardSet = cardList.concat(cardList); //two of each card->we need two copies of the smae card
+            console.log(cardSet);
+            //shuffling them 
+            for (let i = 0; i < cardSet.length; i++) {
+                let j = Math.floor(Math.random() * cardSet.length); //get random index between 0 and 1-> math.random and then picks between 0 and 20 -> excluding 20
+                //swap amongst them
+                let temp = cardSet[i];
+                cardSet[i] = cardSet[j];
+                cardSet[j] = temp;
+            }
+            console.log(cardSet);
+        }
+
+        function startGame() {
+            //arrange the board 4x5
+            for (let r = 0; r < rows; r++) {
+                let row = [];
+                for (let c = 0; c < columns; c++) {
+                    let cardImg = cardSet.pop();
+                    row.push(cardImg);
+
+                    let card = document.createElement("img");
+                    card.id = r.toString() + "-" + c.toString();
+                    card.src = cardImg + ".jpg";
+                    card.classList.add("card");
+                    card.addEventListener("click", selectCard);
+                    document.getElementById("board").append(card);
+                }
+                board.push(row);
+            }
+            console.log(board);
+            setTimeout(hideCards, 1000);
+        }
+
+        function hideCards() {
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns; c++) {
+                    let card = document.getElementById(r.toString() + "-" + c.toString());
+                    card.src = "back.jpg";//hides the cards with this back image
+                }
+            }
+        }
+
+        function selectCard() {//handles the click event
+            if (this.src.includes("back")) {//checks if the card has its back i.e. hidden
+                if (!card1Selected) {//no card selected, then current card=card1
+                    card1Selected = this;
+
+                    let coords = card1Selected.id.split("-"); //"0-1" -> ["0", "1"] as said before will have the row and column coordinates 
+                    let r = parseInt(coords[0]);
+                    let c = parseInt(coords[1]);
+
+                    card1Selected.src = board[r][c] + ".jpg";//img shown
+                }
+                else if (!card2Selected && this != card1Selected) {//not same
+                    card2Selected = this;
+
+                    let coords = card2Selected.id.split("-"); //"0-1" -> ["0", "1"]
+                    let r = parseInt(coords[0]);
+                    let c = parseInt(coords[1]);
+
+                    card2Selected.src = board[r][c] + ".jpg";
+                    setTimeout(update, 1000);
+                }
+            }
+        }
+
+        function update() {
+            //if cards aren't the same, flip both back
+            if (card1Selected.src != card2Selected.src) {
+                card1Selected.src = "back.jpg";
+                card2Selected.src = "back.jpg";
+                errors += 1;//since not same, error count adds
+                document.getElementById("errors").innerText = errors;
+            }
+
+            card1Selected = null;
+            card2Selected = null;
+        }
+    </script>
+</head>
+<body>
+    <h1><style>
+        h1{
+            font-weight: bold;
+            color:aliceblue;
+        }
+        h2{
+            font-weight: bold;
+            color:aliceblue;
+        }
+    </style>MEMORY CARD GAME</h1>
+    <h2>Errors: <span id="errors">0</span></h2>
+    <div id="board"></div>
+</body>
+</html>

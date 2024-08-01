@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TIC TAC TOE</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+        }
+
+        hr {
+            width: 500px;
+            height: 2px;
+            background-color: rgb(73, 72, 72);
+        }
+
+        #board {
+            width: 450px;
+            height: 450px;
+            background-color: gray; 
+            margin: 0 auto; /* Centering the board */
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .tile {
+            width: 147px; /* Width of each tile */
+            height: 147px; /* Height of each tile */
+            font-size: 150px; /* Size of the X's and O's */
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+        }
+
+        .winner {
+            background-color: lightgray;
+            color: rgb(59, 169, 57);
+        }
+
+        .horizontal-line {
+            border-bottom: 3px solid rgb(254, 4, 4);
+        }
+
+        .vertical-line {
+            border-right: 3px solid rgb(255, 1, 1);
+        }
+    </style>
+    <script>
+        var board;
+        var playerO = "O";
+        var playerX = "X";
+        var currPlayer = playerX;
+        var gameOver = false;
+
+        window.onload = function() {
+            setGame();
+        }
+
+        function setGame() {
+            // Initialize the board as a 3x3 grid
+            board = [
+                [' ', ' ', ' '],
+                [' ', ' ', ' '],
+                [' ', ' ', ' ']
+            ];
+
+            // Create 9 tiles for the board
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    let tile = document.createElement("div");
+                    tile.id = r.toString() + "-" + c.toString();
+                    tile.classList.add("tile");
+
+                    // Add horizontal lines for the first two rows
+                    if (r == 0 || r == 1) {
+                        tile.classList.add("horizontal-line");
+                    }
+
+                    // Add vertical lines for the first two columns
+                    if (c == 0 || c == 1) {
+                        tile.classList.add("vertical-line");
+                    }
+
+                    tile.innerText = "";
+                    tile.addEventListener("click", setTile); // Add click event listener
+                    document.getElementById("board").appendChild(tile);
+                }
+            }
+        }
+
+        function setTile() {
+            // If the game is over, do nothing
+            if (gameOver) {
+                return;
+            }
+
+            // Get the coordinates of the clicked tile
+            let coords = this.id.split("-"); // e.g., "1-2" -> ["1", "2"]
+            let r = parseInt(coords[0]); // Convert to integer
+            let c = parseInt(coords[1]); // Convert to integer
+
+            // If the spot is already taken, do nothing
+            if (board[r][c] != ' ') {
+                return;
+            }
+
+            // Mark the board and the HTML with the current player's symbol
+            board[r][c] = currPlayer;
+            this.innerText = currPlayer;
+
+            // Switch to the other player
+            if (currPlayer == playerO) {
+                currPlayer = playerX;
+            } else {
+                currPlayer = playerO;
+            }
+
+            // Check if there is a winner
+            checkWinner();
+        }
+
+        function checkWinner() {
+            // Check each row for a win
+            for (let r = 0; r < 3; r++) {
+                if (board[r][0] == board[r][1] && board[r][1] == board[r][2] && board[r][0] != ' ') {
+                    for (let i = 0; i < 3; i++) {
+                        let tile = document.getElementById(r.toString() + "-" + i.toString());
+                        tile.classList.add("winner");
+                    }
+                    gameOver = true;
+                    return;
+                }
+            }
+
+            // Check each column for a win
+            for (let c = 0; c < 3; c++) {
+                if (board[0][c] == board[1][c] && board[1][c] == board[2][c] && board[0][c] != ' ') {
+                    for (let i = 0; i < 3; i++) {
+                        let tile = document.getElementById(i.toString() + "-" + c.toString());
+                        tile.classList.add("winner");
+                    }
+                    gameOver = true;
+                    return;
+                }
+            }
+
+            // Check the main diagonal for a win
+            if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != ' ') {
+                for (let i = 0; i < 3; i++) {
+                    let tile = document.getElementById(i.toString() + "-" + i.toString());
+                    tile.classList.add("winner");
+                }
+                gameOver = true;
+                return;
+            }
+
+            // Check the anti-diagonal for a win
+            if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != ' ') {
+                let tile = document.getElementById("0-2");
+                tile.classList.add("winner");
+
+                tile = document.getElementById("1-1");
+                tile.classList.add("winner");
+
+                tile = document.getElementById("2-0");
+                tile.classList.add("winner");
+
+                gameOver = true;
+                return;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>TIC TAC TOE</h1>
+    <br>
+    <div id="board"></div>
+</body>
+</html>
